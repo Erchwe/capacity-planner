@@ -1,0 +1,17 @@
+{
+  "traffic": {
+    "pattern": "spike",
+    "peak_multiplier": 3.0,
+    "duration_minutes": 20
+  },
+  "service_overrides": {
+    "auth": {
+      "base_latency_ms": 120
+    }
+  },
+  "scaling_policy": {
+    "aggressiveness": "medium",
+    "cooldown_minutes": 10,
+    "risk_tolerance": "conservative"
+  }
+}

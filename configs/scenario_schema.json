@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Capacity Planning Scenario",
+  "type": "object",
+  "required": ["traffic", "service_overrides", "scaling_policy"],
+  "additionalProperties": false,
+
+  "properties": {
+    "traffic": {
+      "type": "object",
+      "required": ["pattern", "peak_multiplier", "duration_minutes"],
+      "additionalProperties": false,
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "enum": ["steady", "spike", "ramp"]
+        },
+        "peak_multiplier": {
+          "type": "number",
+          "minimum": 1.0,
+          "maximum": 10.0
+        },
+        "duration_minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 180
+        }
+      }
+    },
+
+    "service_overrides": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "base_latency_ms": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 2000
+          },
+          "dependency_weight": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 3.0
+          }
+        }
+      }
+    },
+
+    "scaling_policy": {
+      "type": "object",
+      "required": ["aggressiveness", "cooldown_minutes", "risk_tolerance"],
+      "additionalProperties": false,
+      "properties": {
+        "aggressiveness": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "cooldown_minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60
+        },
+        "risk_tolerance": {
+          "type": "string",
+          "enum": ["conservative", "balanced", "aggressive"]
+        }
+      }
+    }
+  }
+}

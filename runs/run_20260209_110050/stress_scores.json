@@ -1,0 +1,26 @@
+{
+  "api-gateway": {
+    "stress_score": 0.0,
+    "bottleneck_risk": 0.0
+  },
+  "auth": {
+    "stress_score": 0.0,
+    "bottleneck_risk": 0.0
+  },
+  "payment": {
+    "stress_score": 0.0,
+    "bottleneck_risk": 0.0
+  },
+  "db": {
+    "stress_score": 0.0,
+    "bottleneck_risk": 0.0
+  },
+  "notification": {
+    "stress_score": 0.0,
+    "bottleneck_risk": 0.0
+  },
+  "analytics": {
+    "stress_score": 0.0,
+    "bottleneck_risk": 0.0
+  }
+}

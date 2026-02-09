@@ -1,0 +1,28 @@
+{
+  "service_metrics": {
+    "api-gateway": {
+      "queue": 0,
+      "latency_ms": 30
+    },
+    "auth": {
+      "queue": 0,
+      "latency_ms": 80
+    },
+    "payment": {
+      "queue": 0,
+      "latency_ms": 120
+    },
+    "db": {
+      "queue": 0,
+      "latency_ms": 150
+    },
+    "notification": {
+      "queue": 0,
+      "latency_ms": 60
+    },
+    "analytics": {
+      "queue": 0,
+      "latency_ms": 100
+    }
+  }
+}

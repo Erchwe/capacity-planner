@@ -1,0 +1,42 @@
+services:
+  api-gateway:
+    base_latency_ms: 30
+    queue_capacity: 100
+    dependencies:
+      auth:
+        weight: 1.0
+      payment:
+        weight: 0.5
+
+  auth:
+    base_latency_ms: 80
+    queue_capacity: 50
+    dependencies:
+      db:
+        weight: 1.2
+
+  payment:
+    base_latency_ms: 120
+    queue_capacity: 40
+    dependencies:
+      db:
+        weight: 1.5
+      notification:
+        weight: 0.7
+
+  db:
+    base_latency_ms: 150
+    queue_capacity: 200
+    dependencies: {}
+
+  notification:
+    base_latency_ms: 60
+    queue_capacity: 30
+    dependencies:
+      analytics:
+        weight: 0.8
+
+  analytics:
+    base_latency_ms: 100
+    queue_capacity: 60
+    dependencies: {}
