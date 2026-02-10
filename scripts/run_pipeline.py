@@ -1,10 +1,20 @@
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.append(str(PROJECT_ROOT))
+
 import json
 import os
 from datetime import datetime
-from pathlib import Path
 
 import yaml
 from jsonschema import validate, ValidationError
+
+from simulator.traffic import generate_traffic_curve
+from simulator.queue import simulate_queue, summarize_queue
+from simulator.propagate import compute_latency_series, summarize_latency
+
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -53,17 +63,50 @@ def validate_scenario(scenario):
 
 def run_simulation(base_services, scenario):
     """
-    Stub simulation output.
-    Day 2 will implement real logic here.
+    Run deterministic service-level simulation.
     """
-    return {
-        "service_metrics": {
-            service: {
-                "queue": 0,
-                "latency_ms": cfg["base_latency_ms"]
-            }
-            for service, cfg in base_services["services"].items()
+    traffic_cfg = scenario["traffic"]
+
+    traffic_curve = generate_traffic_curve(
+        pattern=traffic_cfg["pattern"],
+        peak_multiplier=traffic_cfg["peak_multiplier"],
+        duration_minutes=traffic_cfg["duration_minutes"]
+    )
+
+    service_metrics = {}
+
+    for service_name, service_cfg in base_services["services"].items():
+        # Apply service overrides
+        overrides = scenario.get("service_overrides", {}).get(service_name, {})
+
+        base_latency = overrides.get(
+            "base_latency_ms",
+            service_cfg["base_latency_ms"]
+        )
+
+        queue_capacity = service_cfg["queue_capacity"]
+
+        # Queue simulation
+        queue_history = simulate_queue(
+            traffic_curve=traffic_curve,
+            queue_capacity=queue_capacity
+        )
+        queue_summary = summarize_queue(queue_history)
+
+        # Latency computation
+        latency_series = compute_latency_series(
+            base_latency_ms=base_latency,
+            queue_history=queue_history
+        )
+        peak_latency = summarize_latency(latency_series)
+
+        service_metrics[service_name] = {
+            "queue": queue_summary["max"],
+            "latency_ms": peak_latency
         }
+
+    return {
+        "service_metrics": service_metrics
     }
 
 

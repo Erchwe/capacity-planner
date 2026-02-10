@@ -59,6 +59,25 @@ Scenario Config
 
 ---
 
+## Simulation Core (Deterministic Ground Truth)
+
+The simulation engine serves as the system’s ground truth layer.
+
+It models service behavior using:
+- scenario-based traffic patterns (steady, spike, ramp)
+- queue buildup under load
+- latency amplification caused by queue pressure
+
+All simulations are:
+- deterministic
+- seed-free
+- reproducible given the same configuration
+
+The simulation intentionally avoids real-time metrics or stochastic behavior
+to preserve causal clarity and auditability.
+
+---
+
 ## How to Run (Day 1 Stub)
 
 Install minimal dependencies:

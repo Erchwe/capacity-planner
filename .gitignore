@@ -1,0 +1,12 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Runtime artifacts
+runs/*
+!runs/.gitkeep
+
+# OS / Editor noise
+.DS_Store
+Thumbs.db
+.vscode/
