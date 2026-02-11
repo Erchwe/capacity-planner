@@ -14,8 +14,7 @@ from jsonschema import validate, ValidationError
 from simulator.traffic import generate_traffic_curve
 from simulator.queue import simulate_queue, summarize_queue
 from simulator.propagate import compute_latency_series, summarize_latency
-
-
+from simulator.propagate import propagate_dependency_latency
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 CONFIG_DIR = BASE_DIR / "configs"
@@ -104,6 +103,28 @@ def run_simulation(base_services, scenario):
             "queue": queue_summary["max"],
             "latency_ms": peak_latency
         }
+    
+        # Collect local peak latencies
+    local_latencies = {
+        svc: metrics["latency_ms"]
+        for svc, metrics in service_metrics.items()
+    }
+
+    # Dependency graph from base config
+    dependency_graph = {
+        svc: cfg.get("dependencies", {})
+        for svc, cfg in base_services["services"].items()
+    }
+
+    # Propagate dependency effects
+    effective_latencies = propagate_dependency_latency(
+        local_latencies=local_latencies,
+        service_dependencies=dependency_graph
+    )
+
+    # Update metrics with propagated latency
+    for svc in service_metrics:
+        service_metrics[svc]["latency_ms"] = effective_latencies[svc]
 
     return {
         "service_metrics": service_metrics
