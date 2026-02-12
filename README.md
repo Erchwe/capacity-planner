@@ -78,6 +78,24 @@ to preserve causal clarity and auditability.
 
 ---
 
+## ML Advisory Layer
+
+The system includes a deterministic graph-aware advisory model inspired
+by message passing neural networks (GNN-style propagation).
+
+This layer:
+
+- Computes local stress signals based on queue utilization and latency ratio
+- Propagates stress across service dependencies
+- Outputs calibrated risk scores in the range [0, 1]
+- Remains deterministic and fully auditable
+
+Important:
+The advisory layer does NOT modify simulation outputs.
+It provides recommendation signals only.
+
+---
+
 ## How to Run (Day 1 Stub)
 
 Install minimal dependencies:

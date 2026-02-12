@@ -15,6 +15,7 @@ from simulator.traffic import generate_traffic_curve
 from simulator.queue import simulate_queue, summarize_queue
 from simulator.propagate import compute_latency_series, summarize_latency
 from simulator.propagate import propagate_dependency_latency
+from ml.advisory import compute_service_risk_scores
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 CONFIG_DIR = BASE_DIR / "configs"
@@ -131,17 +132,28 @@ def run_simulation(base_services, scenario):
     }
 
 
-def run_model_inference(simulation_metrics):
+def run_model_inference(simulation_metrics, base_services):
     """
-    Stub ML inference.
+    Deterministic graph-aware advisory scoring.
     """
-    return {
+
+    service_metrics = simulation_metrics["service_metrics"]
+
+    risk_scores = compute_service_risk_scores(
+        service_metrics=service_metrics,
+        base_services=base_services
+    )
+
+    model_outputs = {
         service: {
-            "stress_score": 0.0,
-            "bottleneck_risk": 0.0
+            "risk_score": risk_scores[service],
+            "bottleneck_risk": risk_scores[service]
         }
-        for service in simulation_metrics["service_metrics"].keys()
+        for service in risk_scores
     }
+
+    return model_outputs
+
 
 
 def run_decision_engine(simulation_metrics, model_outputs, scaling_policy):
@@ -179,7 +191,10 @@ def main():
     simulation_metrics = run_simulation(base_services, scenario)
 
     print("Running model inference...")
-    model_outputs = run_model_inference(simulation_metrics)
+    model_outputs = run_model_inference(
+        simulation_metrics,
+        base_services
+    )
 
     print("Running decision engine...")
     recommendations = run_decision_engine(

@@ -70,3 +70,29 @@ Given the same configuration and random seed:
 - decision outputs do not change
 
 This assumption is critical for auditability and post-incident analysis.
+
+---
+
+## Graph-Aware Advisory Model
+
+The ML advisory layer is a deterministic, heuristic-based risk scoring model.
+
+It assumes:
+
+- Risk can be approximated using queue saturation and latency ratios.
+- Dependency influence is linear and proportional to defined weights.
+- One-hop dependency propagation is sufficient to capture primary cascading effects.
+- Risk scores are calibrated using a fixed normalization constant.
+
+The advisory model is not trained on historical data
+and does not perform statistical learning.
+
+It is designed to be:
+- reproducible
+- explainable
+- bounded
+- auditable
+
+The model intentionally avoids recursive or multi-hop message passing
+to prevent uncontrolled amplification and preserve interpretability.
+
