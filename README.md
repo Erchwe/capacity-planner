@@ -47,15 +47,32 @@ This preserves:
 
 ---
 
-## System Architecture (High-Level)
+## System Architecture (Execution Flow)
 
-Scenario Config  
-→ Validation Layer  
-→ Simulation Engine (ground truth)  
-→ ML Advisory Model (GNN)  
-→ Decision Engine  
-→ Structured Outputs (JSON)  
-→ Read-only Dashboard  
+The system follows a layered, deterministic execution pipeline:
+
+Scenario Input  
+↓  
+Validation Layer  
+↓  
+Traffic Generator  
+↓  
+Queue Simulation  
+↓  
+Latency Propagation  
+↓  
+Graph-Aware Advisory Layer  
+↓  
+Policy-Based Decision Engine  
+↓  
+Structured Run Artifacts (JSON)
+
+Each layer has a clearly bounded responsibility:
+
+- Simulation produces ground-truth stress metrics
+- Advisory layer estimates risk likelihood
+- Decision engine applies policy constraints
+- Outputs remain structured and reproducible
 
 ---
 
@@ -96,6 +113,38 @@ It provides recommendation signals only.
 
 ---
 
+## Core Components
+
+### 1. Traffic Simulation
+Generates synthetic traffic curves based on validated scenario inputs.
+Supports steady, spike, and ramp patterns.
+
+### 2. Queue Engine
+Models bounded queue growth under sustained or burst load.
+Outputs peak queue saturation per service.
+
+### 3. Latency Propagation
+Propagates latency influence across service dependencies
+using weighted graph relationships.
+
+### 4. Advisory Risk Scoring
+Computes calibrated stress likelihood scores in the range [0, 1].
+Risk is derived from:
+- queue saturation ratio
+- latency amplification ratio
+- dependency influence weights
+
+### 5. Decision Engine
+Applies deterministic, rule-based scaling policies.
+Supports:
+- scale_up_aggressive
+- scale_up_cautious
+- no_action
+
+Includes topology-aware reinforcement for upstream services.
+
+---
+
 ## How to Run (Day 1 Stub)
 
 Install minimal dependencies:
@@ -114,6 +163,35 @@ This will execute a stubbed end-to-end pipeline and generate
 a reproducible run artifact under the `runs/` directory.
 
 ---
+
+## Design Principles
+
+- Deterministic core execution
+- Bounded and explainable advisory logic
+- Strict separation between simulation and decision layers
+- No hidden optimization loops
+- Reproducible run artifacts for post-analysis
+
+The system prioritizes interpretability over automation.
+
+---
+
+## Roadmap
+
+Current capabilities:
+
+- [x] Deterministic traffic simulation
+- [x] Queue saturation modeling
+- [x] Dependency-aware latency propagation
+- [x] Graph-inspired advisory risk scoring
+- [x] Topology-aware decision engine
+
+Planned improvements:
+
+- [ ] CLI-based dynamic scenario input
+- [ ] REST API interface
+- [ ] Web dashboard visualization
+- [ ] Containerized deployment
 
 ## What This Project Is NOT
 

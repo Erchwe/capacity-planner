@@ -156,13 +156,64 @@ def run_model_inference(simulation_metrics, base_services):
 
 
 
-def run_decision_engine(simulation_metrics, model_outputs, scaling_policy):
+def run_decision_engine(simulation_metrics, model_outputs, scaling_policy, base_services):
     """
-    Stub decision engine.
+    Deterministic rule-based scaling recommendations
+    with topology-aware reinforcement.
     """
+
+    HIGH_RISK = 0.80
+    MEDIUM_RISK = 0.65
+
+    recommendations = {}
+    service_metrics = simulation_metrics["service_metrics"]
+
+    dependency_graph = {
+        svc: cfg.get("dependencies", {})
+        for svc, cfg in base_services["services"].items()
+    }
+
+    # First pass: primary decisions
+    for service, model_data in model_outputs.items():
+        risk = model_data["risk_score"]
+        queue = service_metrics[service]["queue"]
+
+        if risk >= HIGH_RISK:
+            recommendations[service] = {
+                "action": "scale_up_aggressive",
+                "risk_score": round(risk, 3),
+                "queue_level": queue,
+                "reason": f"High risk score ({risk:.2f}) indicates severe stress."
+            }
+        elif risk >= MEDIUM_RISK:
+            recommendations[service] = {
+                "action": "scale_up_cautious",
+                "risk_score": round(risk, 3),
+                "queue_level": queue,
+                "reason": f"Moderate risk score ({risk:.2f}) suggests rising load."
+            }
+
+    # Second pass: upstream reinforcement
+    for service, rec in list(recommendations.items()):
+        if rec["action"] == "scale_up_aggressive":
+            dependencies = dependency_graph.get(service, {})
+
+            for upstream_service in dependencies.keys():
+                if upstream_service not in recommendations:
+                    upstream_risk = model_outputs[upstream_service]["risk_score"]
+                    recommendations[upstream_service] = {
+                        "action": "scale_up_cautious",
+                        "risk_score": round(upstream_risk, 3),
+                        "queue_level": service_metrics[upstream_service]["queue"],
+                        "reason": f"Upstream dependency of aggressively scaled service '{service}'."
+                    }
+
     return {
-        "recommendations": [],
-        "notes": "Decision engine not implemented yet."
+        "recommendations": [
+            {"service": svc, **rec}
+            for svc, rec in recommendations.items()
+        ],
+        "policy_used": scaling_policy
     }
 
 
@@ -200,7 +251,8 @@ def main():
     recommendations = run_decision_engine(
         simulation_metrics,
         model_outputs,
-        scenario["scaling_policy"]
+        scenario["scaling_policy"],
+        base_services
     )
 
     run_dir = create_run_dir()
