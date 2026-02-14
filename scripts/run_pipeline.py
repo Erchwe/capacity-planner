@@ -1,4 +1,5 @@
 import sys
+import argparse
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -27,26 +28,38 @@ def load_base_services():
         return yaml.safe_load(f)
 
 
-def load_scenario_config():
-    """
-    For Day 1, we hardcode a sample scenario.
-    Later, this will be provided by the dashboard.
-    """
+def load_scenario_from_args():
+    parser = argparse.ArgumentParser(
+        description="Run capacity planner with dynamic scenario input."
+    )
+
+    parser.add_argument("--pattern", type=str, default="spike",
+                        choices=["steady", "spike", "ramp"],
+                        help="Traffic pattern type")
+
+    parser.add_argument("--peak", type=float, default=3.0,
+                        help="Peak multiplier for traffic")
+
+    parser.add_argument("--duration", type=int, default=20,
+                        help="Duration in minutes")
+
+    parser.add_argument("--risk_tolerance", type=str, default="conservative",
+                        choices=["conservative", "moderate", "aggressive"],
+                        help="Scaling risk tolerance")
+
+    args = parser.parse_args()
+
     return {
         "traffic": {
-            "pattern": "spike",
-            "peak_multiplier": 3.0,
-            "duration_minutes": 20
+            "pattern": args.pattern,
+            "peak_multiplier": args.peak,
+            "duration_minutes": args.duration
         },
-        "service_overrides": {
-            "auth": {
-                "base_latency_ms": 120
-            }
-        },
+        "service_overrides": {},
         "scaling_policy": {
             "aggressiveness": "medium",
             "cooldown_minutes": 10,
-            "risk_tolerance": "conservative"
+            "risk_tolerance": args.risk_tolerance
         }
     }
 
@@ -233,7 +246,7 @@ def main():
     print("=== Capacity Planner Pipeline (Day 1 Stub) ===")
 
     base_services = load_base_services()
-    scenario = load_scenario_config()
+    scenario = load_scenario_from_args()
 
     print("Validating scenario...")
     validate_scenario(scenario)

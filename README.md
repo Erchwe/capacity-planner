@@ -76,6 +76,23 @@ Each layer has a clearly bounded responsibility:
 
 ---
 
+## CLI Interface
+
+The system supports dynamic scenario configuration via command-line arguments.
+
+Available parameters:
+
+- `--pattern` (steady | spike | ramp)
+- `--peak` (float) – traffic multiplier
+- `--duration` (int) – simulation duration in minutes
+- `--risk_tolerance` (conservative | moderate | aggressive)
+
+This allows flexible experimentation without modifying source code.
+
+All runs remain deterministic given identical inputs.
+
+---
+
 ## Simulation Core (Deterministic Ground Truth)
 
 The simulation engine serves as the system’s ground truth layer.
@@ -145,22 +162,41 @@ Includes topology-aware reinforcement for upstream services.
 
 ---
 
-## How to Run (Day 1 Stub)
+## How to Run (CLI Mode)
 
-Install minimal dependencies:
+Install dependencies:
 
 ```
 pip install pyyaml jsonschema
 ```
 
-Run the pipeline:
+Run with default parameters:
 
 ```
 python scripts/run_pipeline.py
 ```
 
-This will execute a stubbed end-to-end pipeline and generate
-a reproducible run artifact under the `runs/` directory.
+Run with default parameters:
+
+```
+python scripts/run_pipeline.py
+--pattern spike
+--peak 4.0
+--duration 30
+--rsik_tolerance conservative
+```
+
+Supported traffic patterns:
+
+- steady
+- spike
+- ramp
+
+Each run generates a reproducible artifact under the `runs/` directory:
+- config.json
+- metrics.json
+- stress_scores.json
+- recommendations.json
 
 ---
 
@@ -178,20 +214,28 @@ The system prioritizes interpretability over automation.
 
 ## Roadmap
 
-Current capabilities:
+### Current capabilities:
 
 - [x] Deterministic traffic simulation
 - [x] Queue saturation modeling
 - [x] Dependency-aware latency propagation
 - [x] Graph-inspired advisory risk scoring
 - [x] Topology-aware decision engine
+- [x] CLI-based dynamic scenario input
 
-Planned improvements:
+### Deployment & Infrastructure (In Progress)
 
-- [ ] CLI-based dynamic scenario input
-- [ ] REST API interface
+- [ ] REST API interface (FastAPI)
+- [ ] Containerized deployment (Docker)
+- [ ] Cloud deployment (GCP Cloud Run)
+- [ ] Infrastructure as Code (Terraform)
+- [ ] CI/CD pipeline (GitHub Actions)
+
+### Future Extensions
+
 - [ ] Web dashboard visualization
-- [ ] Containerized deployment
+- [ ] Multi-hop dependency propagation
+- [ ] Scenario library & benchmarking
 
 ## What This Project Is NOT
 
