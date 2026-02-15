@@ -243,7 +243,7 @@ def write_json(run_dir, filename, data):
 
 
 def main():
-    print("=== Capacity Planner Pipeline (Day 1 Stub) ===")
+    print("=== Capacity Planner Pipeline ===")
 
     base_services = load_base_services()
     scenario = load_scenario_from_args()
