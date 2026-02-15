@@ -93,6 +93,42 @@ All runs remain deterministic given identical inputs.
 
 ---
 
+## Containerization
+
+The application is fully containerized using Docker.
+
+This ensures:
+
+- Reproducible execution environments
+- Consistent dependency management
+- Cloud-ready packaging
+- Elimination of "works on my machine" issues
+
+### Build Image
+
+```
+docker build -t capacity-planner
+```
+
+### Run (Default Scenario)
+
+```
+docker run capacity-planner
+```
+
+### Run (Custom Scenario)
+
+```
+docker run capacity planner
+--pattern spike
+--peak 4.0
+--duration 30
+```
+
+The container executes the CLI-based simulation pipeline
+and generates structured run artifacts inside the container.
+
+
 ## Simulation Core (Deterministic Ground Truth)
 
 The simulation engine serves as the system’s ground truth layer.
@@ -222,11 +258,11 @@ The system prioritizes interpretability over automation.
 - [x] Graph-inspired advisory risk scoring
 - [x] Topology-aware decision engine
 - [x] CLI-based dynamic scenario input
+- [x] Containerized deployment (Docker)
 
 ### Deployment & Infrastructure (In Progress)
 
 - [ ] REST API interface (FastAPI)
-- [ ] Containerized deployment (Docker)
 - [ ] Cloud deployment (GCP Cloud Run)
 - [ ] Infrastructure as Code (Terraform)
 - [ ] CI/CD pipeline (GitHub Actions)
