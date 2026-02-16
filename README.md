@@ -51,28 +51,34 @@ This preserves:
 
 The system follows a layered, deterministic execution pipeline:
 
-Scenario Input  
-↓  
-Validation Layer  
-↓  
-Traffic Generator  
-↓  
-Queue Simulation  
-↓  
-Latency Propagation  
-↓  
-Graph-Aware Advisory Layer  
-↓  
-Policy-Based Decision Engine  
-↓  
-Structured Run Artifacts (JSON)
+CLI Input  |  REST API Input  
+           ↓  
+      Scenario Builder  
+           ↓  
+      Validation Layer  
+           ↓  
+      Traffic Generator  
+           ↓  
+      Queue Simulation  
+           ↓  
+      Latency Propagation  
+           ↓  
+      Graph-Aware Advisory Layer  
+           ↓  
+      Policy-Based Decision Engine  
+           ↓  
+      Structured JSON Output
 
 Each layer has a clearly bounded responsibility:
-
 - Simulation produces ground-truth stress metrics
 - Advisory layer estimates risk likelihood
 - Decision engine applies policy constraints
 - Outputs remain structured and reproducible
+
+The execution core is shared across both CLI and REST modes.
+- CLI mode generates persistent run artifacts under `runs/`
+- REST mode returns structured JSON responses
+- All execution paths remain deterministic given identical inputs
 
 ---
 
@@ -107,7 +113,7 @@ This ensures:
 ### Build Image
 
 ```
-docker build -t capacity-planner
+docker build -t capacity-planner .
 ```
 
 ### Run (Default Scenario)
@@ -119,10 +125,10 @@ docker run capacity-planner
 ### Run (Custom Scenario)
 
 ```
-docker run capacity planner
---pattern spike
---peak 4.0
---duration 30
+docker run capacity planner \
+--pattern spike \
+--peak 4.0 \
+--duration 30 \
 ```
 
 The container executes the CLI-based simulation pipeline
@@ -198,12 +204,14 @@ Includes topology-aware reinforcement for upstream services.
 
 ---
 
-## How to Run (CLI Mode)
+## How to Run
+
+### CLI Mode
 
 Install dependencies:
 
 ```
-pip install pyyaml jsonschema
+pip install -r requirements.txt
 ```
 
 Run with default parameters:
@@ -212,14 +220,14 @@ Run with default parameters:
 python scripts/run_pipeline.py
 ```
 
-Run with default parameters:
+Run with custom parameters:
 
 ```
 python scripts/run_pipeline.py
 --pattern spike
 --peak 4.0
 --duration 30
---rsik_tolerance conservative
+--risk_tolerance conservative
 ```
 
 Supported traffic patterns:
@@ -233,6 +241,42 @@ Each run generates a reproducible artifact under the `runs/` directory:
 - metrics.json
 - stress_scores.json
 - recommendations.json
+
+---
+
+### REST API Mode (FastAPI)
+
+Start server:
+
+```
+uvicorn app:app --reload
+```
+
+Open Swagger UI:
+
+```
+http://localhost:8000/docs
+```
+
+Use the `POST /run` endpoint to submit dynamic traffic scenarios.
+
+---
+
+### Example API Response Structure
+
+```
+{
+    "metrics": {...},
+    "stress_scores": {...},
+    "recommendations": {...}
+}
+```
+
+The API returns structured, deterministic outputs for:
+- service-level queue metrics
+- propagated latency metrics
+- graph-based risk scores
+- policy-driven scaling recommendations
 
 ---
 
@@ -258,11 +302,12 @@ The system prioritizes interpretability over automation.
 - [x] Graph-inspired advisory risk scoring
 - [x] Topology-aware decision engine
 - [x] CLI-based dynamic scenario input
-- [x] Containerized deployment (Docker)
+- [x] Dual execution modes (CLI + REST API)
 
 ### Deployment & Infrastructure (In Progress)
 
-- [ ] REST API interface (FastAPI)
+- [x] Containerized deployment (Docker)
+- [x] REST API interface (FastAPI)
 - [ ] Cloud deployment (GCP Cloud Run)
 - [ ] Infrastructure as Code (Terraform)
 - [ ] CI/CD pipeline (GitHub Actions)
