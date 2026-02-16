@@ -241,26 +241,16 @@ def write_json(run_dir, filename, data):
     with open(run_dir / filename, "w") as f:
         json.dump(data, f, indent=2)
 
-
-def main():
-    print("=== Capacity Planner Pipeline ===")
-
-    base_services = load_base_services()
-    scenario = load_scenario_from_args()
-
-    print("Validating scenario...")
+def execute_pipeline(base_services,scenario):
     validate_scenario(scenario)
 
-    print("Running simulation...")
     simulation_metrics = run_simulation(base_services, scenario)
 
-    print("Running model inference...")
     model_outputs = run_model_inference(
         simulation_metrics,
         base_services
     )
 
-    print("Running decision engine...")
     recommendations = run_decision_engine(
         simulation_metrics,
         model_outputs,
@@ -268,16 +258,30 @@ def main():
         base_services
     )
 
+    return {
+        "metrics": simulation_metrics,
+        "stress_scores": model_outputs,
+        "recommendations": recommendations
+    }
+
+def main():
+    print("=== Capacity Planner Pipeline ===")
+
+    base_services = load_base_services()
+    scenario = load_scenario_from_args()
+
+    print("Running full pipeline...")
+    result = execute_pipeline(base_services, scenario)
+
     run_dir = create_run_dir()
     print(f"Writing run artifacts to {run_dir}")
 
     write_json(run_dir, "config.json", scenario)
-    write_json(run_dir, "metrics.json", simulation_metrics)
-    write_json(run_dir, "stress_scores.json", model_outputs)
-    write_json(run_dir, "recommendations.json", recommendations)
+    write_json(run_dir, "metrics.json", result["metrics"])
+    write_json(run_dir, "stress_scores.json", result["stress_scores"])
+    write_json(run_dir, "recommendations.json", result["recommendations"])
 
     print("Pipeline completed successfully.")
-
 
 if __name__ == "__main__":
     main()
