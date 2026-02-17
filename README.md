@@ -3,6 +3,8 @@
 This project is a **decision-support system** designed to help infrastructure and platform teams
 analyze service stress, saturation risk, and scaling needs under different traffic scenarios.
 
+This project demonstrates deterministic infrastructure modeling combined with graph-aware advisory scoring in a containerized cloud-ready architecture.
+
 The system intentionally **does not perform auto-scaling**.
 Instead, it combines:
 - a deterministic simulation engine
@@ -106,9 +108,9 @@ The application is fully containerized using Docker.
 This ensures:
 
 - Reproducible execution environments
-- Consistent dependency management
-- Cloud-ready packaging
-- Elimination of "works on my machine" issues
+- Cloud-ready deployment packaging
+- Consistent dependency isolation
+- Stateless API execution
 
 ### Build Image
 
@@ -116,23 +118,31 @@ This ensures:
 docker build -t capacity-planner .
 ```
 
-### Run (Default Scenario)
+### Run API Service (Default Scenario)
 
 ```
-docker run capacity-planner
+docker run -p 8000:8000 capacity-planner
 ```
 
-### Run (Custom Scenario)
+Open Swagger UI:
+http://localhost:8000/docs
+
+The container runs the FastAPI service by default and does not execute the CLI entrypoint.
+
+### Custom Scenario
+
+Custom scenarios are submitted via HTTP request to the running API.
+
+Example request body:
 
 ```
-docker run capacity planner \
---pattern spike \
---peak 4.0 \
---duration 30 \
+{
+     "pattern": "spike",
+     "peak": 4.0,
+     "duration": 30,
+     "risk_tolerance": "aggressive"
+}
 ```
-
-The container executes the CLI-based simulation pipeline
-and generates structured run artifacts inside the container.
 
 ---
 
@@ -224,12 +234,12 @@ python scripts/run_pipeline.py
 Run with custom parameters:
 
 ```
-python scripts/run_pipeline.py
---pattern spike
---peak 4.0
---duration 30
---risk_tolerance conservative
+python scripts/run_pipeline.py --pattern spike --peak 4.0 --duration 30 --risk_tolerance conservative
 ```
+
+Note: Multi-line shell commands may behave differently across operating systems.
+For cross-platform compatibility (Windows PowerShell, CMD, Bash),
+prefer single-line commands.
 
 Supported traffic patterns:
 
@@ -265,7 +275,7 @@ Use the `POST /run` endpoint to submit dynamic traffic scenarios.
 
 ### Example API Response Structure
 
-```
+```json
 {
     "metrics": {...},
     "stress_scores": {...},
