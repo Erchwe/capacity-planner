@@ -134,6 +134,7 @@ docker run capacity planner \
 The container executes the CLI-based simulation pipeline
 and generates structured run artifacts inside the container.
 
+---
 
 ## Simulation Core (Deterministic Ground Truth)
 
