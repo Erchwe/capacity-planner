@@ -10,3 +10,11 @@ runs/*
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# Terraform crash logs
+crash.log
