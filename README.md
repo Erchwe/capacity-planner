@@ -5,6 +5,8 @@ analyze service stress, saturation risk, and scaling needs under different traff
 
 This project demonstrates deterministic infrastructure modeling combined with graph-aware advisory scoring in a containerized cloud-ready architecture.
 
+The system is deployed on Google Cloud Run and fully managed via Terraform Infrastructure as Code.
+
 The system intentionally **does not perform auto-scaling**.
 Instead, it combines:
 - a deterministic simulation engine
@@ -273,6 +275,15 @@ Use the `POST /run` endpoint to submit dynamic traffic scenarios.
 
 ---
 
+### Live Deployment
+
+The service is deployed on Google Cloud Run (EU region).
+
+Swagger UI:
+https://capacity-planner-<your-service-id>.europe-west1.run.app/docs
+
+(Deployment URL varies per project)
+
 ### Example API Response Structure
 
 ```json
@@ -303,6 +314,57 @@ The system prioritizes interpretability over automation.
 
 ---
 
+## Cloud Deployment (Infrastructure as Code)
+
+The cloud infrastructure for this project is fully managed using Terraform.
+
+Infrastructure components provisioned via Terraform:
+
+- Artifact Registry (Docker repository)
+- Cloud Run service (serverless deployment)
+- Public IAM access binding
+- Region-scoped deployment (europe-west1)
+
+Terraform is the single source of truth for infrastructure.
+Manual deployment via CLI is no longer required.
+
+### Infrastructure Directory
+
+```
+infra/
+  provider.tf
+  variables.tf
+  main.tf
+  outputs.tf
+```
+
+### Initialize Terraform
+
+```
+cd infra
+terraform init
+```
+
+### Review Changes
+
+```
+terraform plan
+```
+
+### Apply Infrastructure
+
+```
+terraform apply
+```
+
+The Cloud Run service is deployed in the EU region:
+```
+europe-west1
+```
+This aligns with EU-focused deployment positioning.
+
+---
+
 ## Roadmap
 
 ### Current capabilities:
@@ -315,12 +377,12 @@ The system prioritizes interpretability over automation.
 - [x] CLI-based dynamic scenario input
 - [x] Dual execution modes (CLI + REST API)
 
-### Deployment & Infrastructure (In Progress)
+### Deployment & Infrastructure
 
 - [x] Containerized deployment (Docker)
 - [x] REST API interface (FastAPI)
-- [ ] Cloud deployment (GCP Cloud Run)
-- [ ] Infrastructure as Code (Terraform)
+- [x] Cloud deployment (GCP Cloud Run)
+- [x] Infrastructure as Code (Terraform)
 - [ ] CI/CD pipeline (GitHub Actions)
 
 ### Future Extensions
