@@ -365,6 +365,32 @@ This aligns with EU-focused deployment positioning.
 
 ---
 
+## Continuous Deployment (CI/CD)
+
+The project includes an automated CI/CD pipeline powered by GitHub Actions.
+
+On every push to the `main` branch:
+
+1. Docker image is built
+2. Image is pushed to Artifact Registry
+3. Cloud Run is automatically deployed
+4. A new revision is created and traffic is routed to the latest version
+
+This enables:
+
+- Push-to-production workflow
+- Automated container builds
+- Immutable revision rollouts
+- Fully reproducible deployment lifecycle
+
+No manual `docker build` or `gcloud run deploy` commands are required.
+
+The CI/CD workflow is defined under:
+
+```
+.github/workflows/deploy.yml
+```
+
 ## Roadmap
 
 ### Current capabilities:
@@ -383,7 +409,7 @@ This aligns with EU-focused deployment positioning.
 - [x] REST API interface (FastAPI)
 - [x] Cloud deployment (GCP Cloud Run)
 - [x] Infrastructure as Code (Terraform)
-- [ ] CI/CD pipeline (GitHub Actions)
+- [x] CI/CD pipeline (GitHub Actions)
 
 ### Future Extensions
 
