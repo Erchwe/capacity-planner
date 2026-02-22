@@ -314,6 +314,31 @@ The system prioritizes interpretability over automation.
 
 ---
 
+## Observability
+
+The service implements structured JSON logging compatible with Google Cloud Logging.
+
+Each API request generates:
+
+- Unique request_id for trace correlation
+- Scenario parameter logging at execution start
+- Execution time measurement
+- Recommendation summary metrics
+- Structured error logs with full stack trace
+
+Logs are emitted to stdout and automatically collected by Cloud Run,
+allowing filtering by fields such as:
+
+- level
+- request_id
+- execution_time_seconds
+- recommendation_count
+- pattern
+
+This ensures production-grade traceability and debugging capabilities.
+
+---
+
 ## Cloud Deployment (Infrastructure as Code)
 
 The cloud infrastructure for this project is fully managed using Terraform.
